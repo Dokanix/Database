@@ -15,7 +15,7 @@ namespace Database
         private int Position = 0;
         public static int FileAccessCount { get; private set; } = 0;
         private long TapeSize { get; set; }
-        public bool EOF { get => Position * 8 >= TapeSize; }
+        public bool EOF { get => Position * 8 >= TapeSize && ReadBuffer.Empty; }
 
         public Tape (string fileName)
         {
@@ -30,11 +30,10 @@ namespace Database
 
         private void Flush()
         {
-            if (Settings.DEBUG) Console.WriteLine("Accessing File and Flushing");
-
             if (WriteBuffer.Empty) return;
 
             FileAccessCount++;
+            // if (Settings.DEBUG) Console.WriteLine("Accessing File and Flushing");
 
             using (BinaryWriter writer = new BinaryWriter(File.Open(FileName, FileMode.Append)))
             {
@@ -73,7 +72,7 @@ namespace Database
 
         private void FillBuffer()
         {
-            if (Settings.DEBUG) Console.WriteLine("Accessing File");
+            // if (Settings.DEBUG) Console.WriteLine("Accessing File");
             FileAccessCount++;
 
 
@@ -91,7 +90,14 @@ namespace Database
                     ReadBuffer.Append(new Record(reader.ReadDouble()));
                     counter++;
                 }
+
+                while (!WriteBuffer.Finished && counter < Settings.PAGE_SIZE)
+                {
+                    ReadBuffer.Append(WriteBuffer.Next());
+                }
             }
+
+
         }
 
         public Record Peek()
@@ -108,7 +114,6 @@ namespace Database
 
         public Record Read()
         {
-
             if (!WriteBuffer.Empty) Flush();
 
             if (ReadBuffer.Empty)

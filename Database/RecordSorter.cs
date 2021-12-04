@@ -49,6 +49,26 @@ namespace Database
                 Console.WriteLine("Finished Distributing Records\n");
         }
 
+        private List<Record> getRun(Tape tape)
+        {
+            List<Record> list = new List<Record>();
+
+            if (!tape.EOF)
+            {
+                Record record = tape.Read();
+
+                list.Add(record);
+
+                while (!tape.EOF && !(record > tape.Peek()))
+                {
+                    record = tape.Read();
+                    list.Add(record);
+                }
+            }
+
+            return list;
+        }
+
         private void Merge()
         {
             if (Settings.DEBUG)
@@ -57,48 +77,52 @@ namespace Database
 
             while (!FirstTape.EOF || !SecondTape.EOF)
             {
-                Record firstRecord = FirstTape.Peek();
-                Record secondRecord = SecondTape.Peek();
+                List<Record> firstRecords = getRun(FirstTape);
+                List<Record> secondRecords = getRun(SecondTape);
 
-                if (FirstTape.EOF)
+                int firstCounter = 0;
+                int secondCounter = 0;
+
+                while (true)
                 {
-                    while (!SecondTape.EOF)
+                    if (firstCounter >= firstRecords.Count && secondCounter >= secondRecords.Count) break;
+
+                    if (firstCounter >= firstRecords.Count)
                     {
-                        secondRecord = SecondTape.Read();
-                        if (Settings.DEBUG)
-                            Console.WriteLine(secondRecord.Value);
-                        Records.Write(secondRecord);
+                        while (secondCounter < secondRecords.Count)
+                        {
+                            if (Settings.DEBUG) Console.WriteLine(secondRecords[secondCounter].Value);
+                            Records.Write(secondRecords[secondCounter]);
+                            secondCounter++;
+                        }
+
+                        break;
                     }
 
-                    break;
-                } else if (SecondTape.EOF)
-                {
-                    while (!FirstTape.EOF)
+                    if (secondCounter >= secondRecords.Count)
                     {
-                        firstRecord = FirstTape.Read();
-                        if (Settings.DEBUG)
-                            Console.WriteLine(firstRecord.Value);
-                        Records.Write(firstRecord);
+                        while (firstCounter < firstRecords.Count)
+                        {
+                            if (Settings.DEBUG) Console.WriteLine(firstRecords[firstCounter].Value);
+                            Records.Write(firstRecords[firstCounter]);
+                            firstCounter++;
+                        }
+
+                        break;
                     }
 
-                    break;
+                    if (firstRecords[firstCounter] < secondRecords[secondCounter])
+                    {
+                        if (Settings.DEBUG) Console.WriteLine(firstRecords[firstCounter].Value);
+                        Records.Write(firstRecords[firstCounter]);
+                        firstCounter++;
+                    } else
+                    {
+                        if (Settings.DEBUG) Console.WriteLine(secondRecords[secondCounter].Value);
+                        Records.Write(secondRecords[secondCounter]);
+                        secondCounter++;
+                    }
                 }
-
-
-                if (firstRecord < secondRecord)
-                {
-                    firstRecord = FirstTape.Read();
-                    if (Settings.DEBUG)
-                        Console.WriteLine(firstRecord.Value);
-                    Records.Write(firstRecord);
-                } else
-                {
-                    secondRecord = SecondTape.Read();
-                    if (Settings.DEBUG)
-                        Console.WriteLine(secondRecord.Value);
-                    Records.Write(secondRecord);
-                }
-               
             }
 
             FirstTape.Clear();

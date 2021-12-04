@@ -8,7 +8,7 @@ namespace Database
 {
     static class Settings
     {
-        public static int PAGE_SIZE { get; } = 10000;
+        public static int PAGE_SIZE { get; } = 100;
         public static int RECORD_SIZE { get; } = 8;
         public static bool DEBUG { get; } = false;
     }

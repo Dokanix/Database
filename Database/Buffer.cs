@@ -38,7 +38,6 @@ namespace Database
 
         public Record Next()
         {
-            if (Settings.DEBUG) Console.WriteLine($"Current: {Current}, Size: {Size}");
             Record record = Records[Current];
             Current++;
 
@@ -51,7 +50,7 @@ namespace Database
 
         public void Clear()
         {
-            if (Settings.DEBUG) Console.WriteLine("Clearing");
+            // if (Settings.DEBUG) Console.WriteLine("Clearing");
             Size = 0;
             Current = 0;
         }
