@@ -7,7 +7,7 @@ namespace Database
         static void Main(string[] args)
         {
             RecordGenerator recordGenerator = new RecordGenerator("Records.dat");
-            Tape records = recordGenerator.GenerateRecords(100000);
+            Tape records = recordGenerator.GenerateRecords(12);
 
             RecordSorter recordSorter = new RecordSorter(records);
             recordSorter.Sort();

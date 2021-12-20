@@ -12,7 +12,7 @@ namespace Database
         private Tape FirstTape = new Tape("FirstTape.dat");
         private Tape SecondTape = new Tape("SecondTape.dat");
         private bool Sorted = false;
-        public int Phases { get; set; } = 0;
+        public int Phases { get; set; } = -1;
 
         public RecordSorter(Tape records)
         {
@@ -140,6 +140,7 @@ namespace Database
                 Console.WriteLine($"Phase: {Phases}");
                 Distribute();
                 Merge();
+                if (Settings.DEBUG) Console.ReadLine();
             }
         }
     }

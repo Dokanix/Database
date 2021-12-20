@@ -10,6 +10,6 @@ namespace Database
     {
         public static int PAGE_SIZE { get; } = 100;
         public static int RECORD_SIZE { get; } = 8;
-        public static bool DEBUG { get; } = false;
+        public static bool DEBUG { get; } = true;
     }
 }
